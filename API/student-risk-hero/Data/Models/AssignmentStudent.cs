@@ -11,6 +11,9 @@ namespace student_risk_hero.Data.Models
         public string? Comments { get; set; }
 
         [ForeignKey("AssignmentId")]
-        public Assignment Assignment { get; set; }
+        public Assignment? Assignment { get; set; }
+
+        [ForeignKey("StudentId")]
+        public Student? Student { get; set; }
     }
 }

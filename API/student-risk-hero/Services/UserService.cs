@@ -14,6 +14,7 @@ namespace student_risk_hero.Services
         private readonly IUnitOfWork unitOfWork;
         private readonly IBaseRepository<Teacher> teacherService;
         private readonly IBaseRepository<Counselor> counselorService;
+        private readonly IBaseRepository<Student> studentService;
         private readonly IBaseRepository<Director> directorService;
         private readonly IBaseRepository<User> BaseRepository;
 
@@ -23,6 +24,7 @@ namespace student_risk_hero.Services
             IUnitOfWork unitOfWork,
             IBaseRepository<Teacher> teacherService,
             IBaseRepository<Counselor> counselorService,
+            IBaseRepository<Student> studentService,
             IBaseRepository<Director> directorService) : base(baseRepository)
         {
             BaseRepository = baseRepository;
@@ -30,6 +32,7 @@ namespace student_risk_hero.Services
             this.unitOfWork = unitOfWork;
             this.teacherService = teacherService;
             this.counselorService = counselorService;
+            this.studentService = studentService;
             this.directorService = directorService;
         }
 

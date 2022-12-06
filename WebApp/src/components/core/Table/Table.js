@@ -21,10 +21,10 @@ const Table = (props) => {
 
     const thead = (
         <tr>
-           {props.header.map(header => {
+           {props.header.map((header, idx) => {
                 let classes = header === '' ? 'option-th' : '';
                 classes += props.thirdHandler ? ' third' : ''
-                return <th className={classes}>{header}</th>
+                return <th key={idx} className={classes}>{header}</th>
             })}
         </tr>
     );
@@ -52,9 +52,9 @@ const Table = (props) => {
            {data.map(body => {
                 return (
                     <tr key={body["id"]}>
-                        {props.rows.map(key => {
-                            const row = key !== "options" ? <td>{isDate(key) ? body[key].toString().split('T')[0] : body[key]}</td> 
-                                                          :  <td className="options">
+                        {props.rows.map((key, idx) => {
+                            const row = key !== "options" ? <td key={idx}>{isDate(key) ? body[key].toString().split('T')[0] : body[key]}</td> 
+                                                          :  <td key={idx} className="options">
                                                                 {props.thirdHandler && <Button onClick={() => props.thirdHandler(body["id"])}>{props.thirdName}</Button>}
                                                                 {props.editHandler && <Button onClick={() => props.editHandler(body["id"])}>{props.editName ? props.editName : 'Edit'}</Button>}
                                                                 {props.deleteHandler && <Button onClick={() => props.deleteHandler(body["id"])}>Delete</Button>}

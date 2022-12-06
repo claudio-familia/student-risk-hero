@@ -182,7 +182,6 @@ const SignUp = () => {
                                                     placeholder="Select your role"
                                                     error={state.errors.Role}
                                                     onChange={(e) => {onInputChange(e, 'Role')}}>
-                                                        <option value="Student">Student</option>
                                                         <option value="Teacher">Teacher</option>
                                                         <option value="Counselor">Counselor</option>
                                                         <option value="Director">Director</option>

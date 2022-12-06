@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using student_risk_hero.Data;
 
@@ -11,9 +12,11 @@ using student_risk_hero.Data;
 namespace studentriskhero.Migrations
 {
     [DbContext(typeof(StudentRiskHeroContext))]
-    partial class StudentRiskHeroContextModelSnapshot : ModelSnapshot
+    [Migration("20221206203957_CourseId")]
+    partial class CourseId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -86,6 +89,9 @@ namespace studentriskhero.Migrations
                     b.Property<string>("Comments")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("CourseId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -116,6 +122,8 @@ namespace studentriskhero.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AssignmentId");
+
+                    b.HasIndex("CourseId");
 
                     b.ToTable("AssignmentStudents");
                 });
@@ -743,10 +751,14 @@ namespace studentriskhero.Migrations
             modelBuilder.Entity("student_risk_hero.Data.Models.AssignmentStudent", b =>
                 {
                     b.HasOne("student_risk_hero.Data.Models.Assignment", "Assignment")
-                        .WithMany("Submissions")
+                        .WithMany()
                         .HasForeignKey("AssignmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("student_risk_hero.Data.Models.Assignment", null)
+                        .WithMany("Submissions")
+                        .HasForeignKey("CourseId");
 
                     b.Navigation("Assignment");
                 });

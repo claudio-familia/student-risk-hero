@@ -38,8 +38,7 @@ namespace student_risk_hero.Controllers
             var tran = unitOfWork.CreateTransaction();
             try
             {
-                var createdStudent = baseService.Add(entity);
-                userService.Add(new Data.Models.User()
+                var createdUser = userService.Add(new Data.Models.User()
                 {
                     Firstname = entity.Firstname,
                     Lastname = entity.Lastname,
@@ -50,6 +49,8 @@ namespace student_risk_hero.Controllers
                     Password = "Unicda",
                     Role = nameof(RoleTypes.Student)
                 });
+                entity.UserId = createdUser.Id;
+                var createdStudent = baseService.Add(entity);
                 tran.Commit();
                 return Ok(createdStudent);
             }
