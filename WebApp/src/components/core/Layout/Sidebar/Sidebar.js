@@ -15,6 +15,9 @@ const Sidebar = props => {
                     </ul>
                 </li>
                 <li>
+                    <NavLink activeClassName='active' to='/risk-profiles'>Risk profiles</NavLink>
+                </li>
+                <li>
                     <NavLink activeClassName='active' to='/users'>Users</NavLink>
                 </li>
                 <li>
@@ -22,6 +25,9 @@ const Sidebar = props => {
                 </li>
                 <li>
                     <NavLink activeClassName='active' to='/students'>Students</NavLink>
+                </li>
+                <li>
+                    <NavLink activeClassName='active' to='/assignments'>Assignments</NavLink>
                 </li>
             </ul>
         </div>

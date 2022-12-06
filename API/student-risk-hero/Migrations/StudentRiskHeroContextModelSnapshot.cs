@@ -224,6 +224,8 @@ namespace studentriskhero.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("TeacherId");
+
                     b.ToTable("Courses");
                 });
 
@@ -327,13 +329,26 @@ namespace studentriskhero.Migrations
                     b.Property<Guid?>("DeletedBy")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Firstname")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Gender")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<string>("Lastname")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -383,7 +398,6 @@ namespace studentriskhero.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("State")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("StudentId")
@@ -415,11 +429,9 @@ namespace studentriskhero.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ActionerId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("AssistantType")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("CounselorId")
@@ -431,7 +443,7 @@ namespace studentriskhero.Migrations
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("Date")
+                    b.Property<DateTime?>("Date")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("DeletedAt")
@@ -451,7 +463,7 @@ namespace studentriskhero.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsClosingFinding")
+                    b.Property<bool?>("IsClosingFinding")
                         .HasColumnType("bit");
 
                     b.Property<bool?>("IsDeleted")
@@ -498,11 +510,19 @@ namespace studentriskhero.Migrations
                     b.Property<Guid?>("DeletedBy")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<Guid>("RiskProfileId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -549,6 +569,10 @@ namespace studentriskhero.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Gender")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -579,6 +603,8 @@ namespace studentriskhero.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Course");
 
                     b.ToTable("Students");
                 });
@@ -709,6 +735,15 @@ namespace studentriskhero.Migrations
                     b.Navigation("Assignment");
                 });
 
+            modelBuilder.Entity("student_risk_hero.Data.Models.Course", b =>
+                {
+                    b.HasOne("student_risk_hero.Data.Models.Teacher", "Teacher")
+                        .WithMany()
+                        .HasForeignKey("TeacherId");
+
+                    b.Navigation("Teacher");
+                });
+
             modelBuilder.Entity("student_risk_hero.Data.Models.CourseStudent", b =>
                 {
                     b.HasOne("student_risk_hero.Data.Models.Student", "Student")
@@ -734,7 +769,7 @@ namespace studentriskhero.Migrations
             modelBuilder.Entity("student_risk_hero.Data.Models.RiskProfiles.RiskProfileEntries", b =>
                 {
                     b.HasOne("student_risk_hero.Data.Models.RiskProfiles.RiskProfile", "RiskProfile")
-                        .WithMany()
+                        .WithMany("Entries")
                         .HasForeignKey("RiskProfileId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -745,12 +780,30 @@ namespace studentriskhero.Migrations
             modelBuilder.Entity("student_risk_hero.Data.Models.RiskProfiles.RiskProfileEvidence", b =>
                 {
                     b.HasOne("student_risk_hero.Data.Models.RiskProfiles.RiskProfile", "RiskProfile")
-                        .WithMany()
+                        .WithMany("Evidences")
                         .HasForeignKey("RiskProfileId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("RiskProfile");
+                });
+
+            modelBuilder.Entity("student_risk_hero.Data.Models.Student", b =>
+                {
+                    b.HasOne("student_risk_hero.Data.Models.Course", "CurrentCourse")
+                        .WithMany()
+                        .HasForeignKey("Course")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CurrentCourse");
+                });
+
+            modelBuilder.Entity("student_risk_hero.Data.Models.RiskProfiles.RiskProfile", b =>
+                {
+                    b.Navigation("Entries");
+
+                    b.Navigation("Evidences");
                 });
 #pragma warning restore 612, 618
         }

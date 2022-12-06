@@ -12,6 +12,7 @@ const AddStudentForm = (props) => {
 const CourseForm = (props) => {
     const [currentEntity, setCurrentEntity] = useState(undefined);
     const [addStudentForm, setAddStudentForm] = useState(false);
+    const [teachers, setTeachers] = useState([]);
 
     const {
         value: name,
@@ -53,9 +54,17 @@ const CourseForm = (props) => {
         setValue: setEndDateValue
     } = useInput(value => value.trim() !== '', 'The end date input is required');
 
+    const {
+        value: teacher,
+        hasError: teacherError,
+        isValid: teacherIsValid,
+        setIsTouched: setTeacherIsTouched,
+        setValue: setTeacherValue
+    } = useInput(value => true, 'The teacher input is required');
+
     const http = useHttp();
 
-    const fetchData = async (url) => {   
+    const fetchData = async () => {   
         const response = await http.sendRequest({ url: 'courses/'+props.id });
 
         if(response.ok) {
@@ -66,10 +75,21 @@ const CourseForm = (props) => {
             setEndDateValue({ target: { value: data.end.split('T')[0]}});
             setSchoolValue({ target: { value: data.school}});
             setStartDateValue({ target: { value: data.start.split('T')[0]}});
+            setTeacherValue({ target: { value: data.teacherId}});
+        }
+    };
+
+    const feachTeacherData = async () => {   
+        const response = await http.sendRequest({ url: 'teachers' });
+
+        if(response.ok) {
+            const data = await response.json();
+            setTeachers(data)
         }
     };
 
     useEffect(() => {
+        feachTeacherData();
         if(props.id) {
             fetchData();
         }
@@ -77,7 +97,7 @@ const CourseForm = (props) => {
     }, [])
 
 
-    const formIsValid = nameIsValid && descriptionIsValid && startDateIsValid && endDateIsValid && schoolIsValid;
+    const formIsValid = nameIsValid && teacherIsValid && descriptionIsValid && startDateIsValid && endDateIsValid && schoolIsValid;
 
     const submitHandler = (e) => {
         e.preventDefault();
@@ -90,7 +110,8 @@ const CourseForm = (props) => {
                     description,
                     school,
                     start: startDate,
-                    end: endDate
+                    end: endDate,
+                    teacherId: teacher
                 }
 
                 http.sendRequest({ url: 'courses' }, data, 'PUT').then(() => {
@@ -103,7 +124,8 @@ const CourseForm = (props) => {
                     description,
                     school,
                     start: startDate,
-                    end: endDate
+                    end: endDate,
+                    teacherId: teacher
                 }
 
                 http.sendRequest({ url: 'courses' }, data, 'POST').then(() => {
@@ -113,6 +135,7 @@ const CourseForm = (props) => {
             }
         } else {
             setNameIsTouched(true);
+            setTeacherIsTouched(true);
             setEndDateIsTouched(true);
             setStartDateIsTouched(true);
         }
@@ -163,6 +186,20 @@ const CourseForm = (props) => {
                         error={schoolError}
                         onChange={setSchoolValue}
                         onBlur={setSchoolIsTouched} />
+                </div>
+                <div className="col-xs-12">
+                    <Input 
+                        label="Teacher" 
+                        value={teacher} 
+                        type="dropdown" 
+                        placeholder="Select the teacher"
+                        error={teacherError}
+                        onChange={setTeacherValue}
+                        onBlur={setTeacherIsTouched}>
+                        {teachers.map(res => {
+                            return <option value={res.id}>{res.firstname} {res.lastname}</option>
+                        })}
+                    </Input>
                 </div>
                 <div className="col-xs-12">
                     <Input 

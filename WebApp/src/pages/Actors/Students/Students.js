@@ -7,11 +7,11 @@ import { ErrorAlert, QuestionAlert, SuccessAlert, InfoAlert } from '../../../ser
 import StudentForm from "./Form/StudentForm";
 import Spinner from "../../../components/core/Layout/Spinner/Spinner";
 
-const StudentPage = () => {
+const StudentPage = (props) => {
     const api = "students";
     const module = "Student";
     const header = ['Firstname', 'Lastname', 'Birthdate', 'Course', ''];
-    const rows = ['firstname', 'lastname', 'birthdate', 'course', 'options'];
+    const rows = ['firstname', 'lastname', 'birthdate', 'currentCourse', 'options'];
 
     const [openForm, setOpenForm] = useState(false);
     const [Students, setStudents] = useState([]);
@@ -62,7 +62,13 @@ const StudentPage = () => {
 
         if(response.ok) {
             const data = await response.json();
-            setStudents(data);
+            const dataToDisplay = data.map(i => {
+                return {
+                    ...i,
+                    currentCourse: i.currentCourse.name
+                }
+            })
+            setStudents(dataToDisplay);
         }
     };
 
@@ -81,19 +87,21 @@ const StudentPage = () => {
                     <h1>{module}s</h1>
                 </div>
                 <div className="col-xs-6 align-end">
-                    <div style={{width: "200px" }}>
+                    {props.hideNew ? null : <div style={{width: "200px" }}>
                         <Button onClick={newHandler}>
                             New {module}
                         </Button>
-                    </div>
+                    </div>}
                 </div>
                 <div className="col-xs-12">
                     <Table 
                         header={header} 
                         rows={rows} 
                         data={Students}
-                        editHandler={edit}
-                        deleteHandler={remove}
+                        dateColumns={['birthdate']}
+                        editHandler={props.select ? props.select : edit}
+                        editName={props.select ? 'Select student' : 'Edit'}
+                        deleteHandler={props.select ? undefined : remove}
                     />
                 </div>
             </div>

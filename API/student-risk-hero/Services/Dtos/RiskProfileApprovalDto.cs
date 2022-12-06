@@ -4,9 +4,8 @@ namespace student_risk_hero.Services.Dtos
 {
     public class RiskProfileApprovalDto
     {
-        public Guid RiskProfileId { get; set; }
         public string Description { get; set; }
-        public DateTime Date { get; set; }
+        public DateTime? Date { get; set; }
 
         public Guid? TeacherId { get; set; }
         public Guid? CounselorId { get; set; }

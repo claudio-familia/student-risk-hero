@@ -9,20 +9,29 @@ namespace student_risk_hero.Services
     {
         private readonly IBaseRepository<RiskProfileEntries> entriesRepository;
         private readonly IBaseRepository<RiskProfileEvidence> evidenceRepository;
+        private readonly ICurrentUserService currentUserService;
+        private readonly IBlobStorageService blobStorageService;
+        private readonly IUnitOfWork unitOfWork;
 
         public RiskProfileService(
             IBaseRepository<RiskProfile> baseRepository,
             IBaseRepository<RiskProfileEntries> entriesRepository,
-            IBaseRepository<RiskProfileEvidence> evidenceRepository
+            IBaseRepository<RiskProfileEvidence> evidenceRepository,
+            ICurrentUserService currentUserService,
+            IBlobStorageService blobStorageService,
+            IUnitOfWork unitOfWork
             ) : base(baseRepository)
         {
             this.entriesRepository = entriesRepository;
             this.evidenceRepository = evidenceRepository;
+            this.currentUserService = currentUserService;
+            this.blobStorageService = blobStorageService;
+            this.unitOfWork = unitOfWork;
         }
 
         public override RiskProfile Add(RiskProfile entity)
         {
-            if (entity.StudentId != null) throw new ArgumentNullException("StudentId cannot be null or 0");
+            if (entity.StudentId == null) throw new ArgumentNullException("StudentId cannot be null");
             if (string.IsNullOrEmpty(entity.Risk)) throw new ArgumentNullException("Risk cannot be null");
 
             entity.State = nameof(RiskProfileStatesEnum.Draft);
@@ -30,7 +39,7 @@ namespace student_risk_hero.Services
             return base.Add(entity);
         }
 
-        public void AddClosingReason(Guid riskProfileId, RiskProfileClosingDto entity)
+        public void AddClosingReason(Guid riskProfileId, RiskProfileEntryDto entity)
         {
             var riskProfile = base.Get(riskProfileId);
 
@@ -45,63 +54,43 @@ namespace student_risk_hero.Services
             {
                 RiskProfileId = riskProfileId,
                 Finding = entity.Finding,
-                AssistantType = entity.AssistantType,
                 IsClosingFinding = true,
+                Date = DateTime.Now,
                 Description = entity.Description,
             };
 
-            if (entity.AssistantType == nameof(RoleTypes.Teacher))
-            {
-                lastEntry.TeacherId = new Guid(entity.ActionerId);
-            }
-
-            if (entity.AssistantType == nameof(RoleTypes.Director))
-            {
-                lastEntry.DirectorId = new Guid(entity.ActionerId);
-            }
-
             entriesRepository.Add(lastEntry);
+
             base.Update(riskProfile);
         }
 
-        public void AddEntry(Guid riskProfileId, RiskProfileEntries entity)
+        public void AddEntry(Guid riskProfileId, RiskProfileEntryDto entity)
         {
             var riskProfile = base.Get(riskProfileId);
 
             if (riskProfile == null) throw new ArgumentException("Risk profile does not exist");
 
-            if (riskProfile.State != nameof(RiskProfileStatesEnum.InProgress))
+            if ((riskProfile.State == nameof(RiskProfileStatesEnum.Approved)))
+            {
+                riskProfile.State = nameof(RiskProfileStatesEnum.InProgress);
+                base.Update(riskProfile);
+            }
+            else if (riskProfile.State != nameof(RiskProfileStatesEnum.InProgress))
                 throw new ArgumentException("Risk profile should be in progress state to add entries");
 
             var entry = new RiskProfileEntries()
             {
                 RiskProfileId = riskProfileId,
                 Finding = entity.Finding,
-                AssistantType = entity.AssistantType,
                 IsClosingFinding = false,
                 Description = entity.Description,
-                Date = entity.Date
+                Date = DateTime.Now,
             };
 
-            if (entity.AssistantType == nameof(RoleTypes.Teacher))
-            {
-                entry.TeacherId = new Guid(entity.ActionerId);
-            }
-
-            if (entity.AssistantType == nameof(RoleTypes.Director))
-            {
-                entry.DirectorId = new Guid(entity.ActionerId);
-            }
-
-            if (entity.AssistantType == nameof(RoleTypes.Counselor))
-            {
-                entry.CounselorId = new Guid(entity.ActionerId);
-            }
-
-            entriesRepository.Add(entity);
+            entriesRepository.Add(entry);
         }
 
-        public void AddEvidence(Guid riskProfileId, RiskProfileEvidenceDto entity)
+        public void AddEvidence(Guid riskProfileId, RiskProfileEvidenceDto entity, IFormFile asset)
         {
             var riskProfile = base.Get(riskProfileId);
 
@@ -110,15 +99,33 @@ namespace student_risk_hero.Services
             if (riskProfile.State == nameof(RiskProfileStatesEnum.Closed))
                 throw new ArgumentException("Risk profile should not be in closed state to add evidence");
 
-            var blobUri = "";
+            if (asset == null)
+                throw new ArgumentException("There is not file attached");
 
-            var evidence = new RiskProfileEvidence()
+            var trans = unitOfWork.CreateTransaction();
+
+            try
             {
-                RiskProfileId = riskProfileId,
-                BlobUrl = blobUri
-            };
+                var blobUri = $"{entity.Description}_{riskProfileId}.{asset.FileName.Split(".")[1]}";
+                Stream stream = asset.OpenReadStream();
+                blobStorageService.UploadDocument(blobUri, stream);
+            
+                var evidence = new RiskProfileEvidence()
+                {
+                    RiskProfileId = riskProfileId,
+                    Description = entity.Description,
+                    Type = entity.Type,
+                    BlobUrl = $"https://studentriskhero.blob.core.windows.net/student-risk-hero/{blobUri}"
+                };
 
-            evidenceRepository.Add(evidence);
+                evidenceRepository.Add(evidence);
+                trans.Commit();
+            }
+            catch(Exception ex)
+            {
+                trans.Rollback();
+                throw;
+            }
         }
 
         public void Approve(Guid riskProfileId, RiskProfileApprovalDto entity)
@@ -153,6 +160,57 @@ namespace student_risk_hero.Services
                 riskProfile.TeachersApproval.HasValue && riskProfile.TeachersApproval.Value &&
                 riskProfile.ParentsApproval.HasValue && riskProfile.ParentsApproval.Value) 
             {
+                riskProfile.State = nameof(RiskProfileStatesEnum.Approved);
+            }
+
+            base.Update(riskProfile);
+        }
+
+        public void ApproveTemp(Guid riskProfileId, string signer)
+        {
+            var riskProfile = base.Get(riskProfileId);
+            var currentDate = DateTime.Now;
+
+            if (riskProfile == null) throw new ArgumentException("Risk profile does not exist");
+
+            if (riskProfile.State != nameof(RiskProfileStatesEnum.Draft))
+                throw new ArgumentException("Risk profile should be in draft state to be approve");
+
+            if (signer == nameof(RoleTypes.Teacher))
+            {
+                riskProfile.TeachersApproval = true;
+                riskProfile.TeachersApprovalDate = currentDate;
+            }
+
+            if (signer == nameof(RoleTypes.Director))
+            {
+                riskProfile.DirectorApproval = true;
+                riskProfile.DirectorApprovalDate = currentDate;
+            }
+
+            if (signer == "Parent")
+            {
+                riskProfile.ParentsApproval = true;
+                riskProfile.ParentsApprovalDate = currentDate;
+            }
+
+            if (
+                riskProfile.DirectorApproval.HasValue && riskProfile.DirectorApproval.Value &&
+                riskProfile.TeachersApproval.HasValue && riskProfile.TeachersApproval.Value &&
+                riskProfile.ParentsApproval.HasValue && riskProfile.ParentsApproval.Value)
+            {
+                var approvalEntry = new RiskProfileEntries()
+                {
+                    RiskProfileId = riskProfileId,
+                    Finding = RiskProfileEntriesConst.AprovalOfProfile,
+                    AssistantType = signer,
+                    IsClosingFinding = false,
+                    Description = $"The risk profile has been approved.",
+                    Date = currentDate,
+                    ActionerId = currentUserService.UserId.ToString()
+                };
+
+                entriesRepository.Add(approvalEntry);
                 riskProfile.State = nameof(RiskProfileStatesEnum.Approved);
             }
 

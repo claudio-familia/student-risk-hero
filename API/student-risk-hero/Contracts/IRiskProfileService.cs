@@ -7,8 +7,9 @@ namespace student_risk_hero.Contracts
     {
         void Approve(Guid id, RiskProfileApprovalDto entity);
         void UpdateEntry(Guid riskProfileId, Guid entryId, RiskProfileEntryDto entity);
-        void AddEntry(Guid riskProfileId, RiskProfileEntries entity);
-        void AddEvidence(Guid riskProfileId, RiskProfileEvidenceDto entity);
-        void AddClosingReason(Guid riskProfileId, RiskProfileClosingDto entity);
+        void AddEntry(Guid riskProfileId, RiskProfileEntryDto entity);
+        void AddEvidence(Guid riskProfileId, RiskProfileEvidenceDto entity, IFormFile asset);
+        void AddClosingReason(Guid riskProfileId, RiskProfileEntryDto entity);
+        void ApproveTemp(Guid id, string signer);
     }
 }

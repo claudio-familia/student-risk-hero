@@ -38,12 +38,50 @@ const StudentForm = (props) => {
     } = useInput(value => value.trim() !== '', 'The birthdate input is required');
 
     const {
+        value: gender,
+        hasError: genderError,
+        isValid: genderIsValid,
+        setIsTouched: setgenderIsTouched,
+        setValue: setgenderValue
+    } = useInput(value => value.trim() !== '', 'The gender input is required');
+
+    const {
         value: course,
         hasError: courseError,
         isValid: courseIsValid,
         setIsTouched: setcourseIsTouched,
         setValue: setcourseValue
     } = useInput(value => value.trim() !== '', 'The course is required');
+
+    const {
+        value: mothersFullName,
+        hasError: mothersFullNameError,
+        isValid: mothersFullNameIsValid,
+        setIsTouched: setMothersFullNameIsTouched,
+        setValue: setMothersFullNameValue
+    } = useInput(value => value.trim() !== '', 'The fathers input is required');
+
+    const {
+        value: fathersFullName,
+        hasError: fathersFullNameError,
+        isValid: fathersFullNameIsValid,
+        setIsTouched: setFathersFullNameIsTouched,
+        setValue: setFathersFullNameValue
+    } = useInput(value => value.trim() !== '', 'The mothers input is required');
+
+    const {
+        value: phoneNumber1,
+        hasError: phoneNumber1Error,
+        setIsTouched: setPhoneNumber1IsTouched,
+        setValue: setPhoneNumber1Value
+    } = useInput();
+
+    const {
+        value: phoneNumber2,
+        hasError: phoneNumber2Error,
+        setIsTouched: setPhoneNumber2IsTouched,
+        setValue: setPhoneNumber2Value
+    } = useInput();
 
     const http = useHttp();
 
@@ -57,6 +95,11 @@ const StudentForm = (props) => {
             setlastnameValue({ target: { value: data.lastname}});
             setbirthdateValue({ target: { value: data.birthdate.split('T')[0]}});
             setcourseValue({ target: { value: data.course}});
+            setgenderValue({ target: { value: data.gender}});
+            setFathersFullNameValue({ target: { value: data.fathersFullName}});
+            setMothersFullNameValue({ target: { value: data.mothersFullName}});
+            setPhoneNumber1Value({ target: { value: data.phoneNumber1}});
+            setPhoneNumber2Value({ target: { value: data.phoneNumber2}});
         }
     };
 
@@ -78,7 +121,10 @@ const StudentForm = (props) => {
     }, [])
 
 
-    const formIsValid = nameIsValid && lastnameIsValid && birthdateIsValid && courseIsValid;
+    const formIsValid = nameIsValid && genderIsValid && 
+                        lastnameIsValid && birthdateIsValid && 
+                        courseIsValid && fathersFullNameIsValid &&
+                        mothersFullNameIsValid;
 
     const submitHandler = (e) => {
         e.preventDefault();
@@ -91,6 +137,11 @@ const StudentForm = (props) => {
                     lastname: lastname,
                     course: course,
                     birthdate: birthdate,
+                    gender: gender,
+                    fathersFullName: fathersFullName,
+                    mothersFullName: mothersFullName,
+                    phoneNumber1: phoneNumber1,
+                    phoneNumber2: phoneNumber2
                 }
 
                 http.sendRequest({ url: api }, data, 'PUT').then(() => {
@@ -103,10 +154,11 @@ const StudentForm = (props) => {
                     lastname: lastname,
                     course: course,
                     birthdate: birthdate,
-                    fathersFullName: '',
-                    mothersFullName: '',
-                    phoneNumber1: '',
-                    phoneNumber2: '',
+                    gender: gender,
+                    fathersFullName: fathersFullName,
+                    mothersFullName: mothersFullName,
+                    phoneNumber1: phoneNumber1,
+                    phoneNumber2: phoneNumber2,
                     profilePicture: ''
                 }
 
@@ -120,6 +172,8 @@ const StudentForm = (props) => {
             setbirthdateIsTouched(true);
             setcourseIsTouched(true);
             setlastnameIsTouched(true);
+            setFathersFullNameIsTouched(true);
+            setMothersFullNameIsTouched(true);
         }
     }
 
@@ -163,6 +217,19 @@ const StudentForm = (props) => {
                 </div>
                 <div className="col-xs-12">
                     <Input 
+                        label="Gender" 
+                        value={gender} 
+                        type="dropdown" 
+                        placeholder="Select your gender"
+                        error={genderError}
+                        onChange={setgenderValue}
+                        onBlur={setgenderIsTouched}>
+                        <option value={'Male'}>{'Male'}</option>
+                        <option value={'Female'}>{'Female'}</option>
+                    </Input>
+                </div>
+                <div className="col-xs-12">
+                    <Input 
                         label="Birthdate" 
                         value={birthdate} 
                         type="date" 
@@ -170,6 +237,46 @@ const StudentForm = (props) => {
                         error={birthdateError}
                         onChange={setbirthdateValue}
                         onBlur={setbirthdateIsTouched} />
+                </div>
+                <div className="col-xs-12">
+                    <Input 
+                        label="Father" 
+                        value={fathersFullName} 
+                        type="text" 
+                        placeholder="Type the father's full name"
+                        error={fathersFullNameError}
+                        onChange={setFathersFullNameValue}
+                        onBlur={setFathersFullNameIsTouched} />
+                </div>
+                <div className="col-xs-12">
+                    <Input 
+                        label="Mother" 
+                        value={mothersFullName} 
+                        type="text"
+                        placeholder="Type the mother's full name"
+                        error={mothersFullNameError}
+                        onChange={setMothersFullNameValue}
+                        onBlur={setMothersFullNameIsTouched} />
+                </div>
+                <div className="col-xs-12">
+                    <Input 
+                        label="Phonenumber 1" 
+                        value={phoneNumber1} 
+                        type="text" 
+                        placeholder="Type the phone number 1"
+                        error={phoneNumber1Error}
+                        onChange={setPhoneNumber1Value}
+                        onBlur={setPhoneNumber1IsTouched} />
+                </div>
+                <div className="col-xs-12">
+                    <Input 
+                        label="Phonenumber 2" 
+                        value={phoneNumber2} 
+                        type="text" 
+                        placeholder="Type the phone number 2"
+                        error={phoneNumber2Error}
+                        onChange={setPhoneNumber2Value}
+                        onBlur={setPhoneNumber2IsTouched} />
                 </div>
                 <div className="col-xs-12">
                     <div style={{width: '150px'}}>

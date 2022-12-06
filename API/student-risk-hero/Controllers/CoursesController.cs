@@ -34,11 +34,11 @@ namespace student_risk_hero.Controllers
         {
             var response = new List<string>();
 
-            if (baseService.Exists(data.CourseId)) return NotFound($"Course with id {data.CourseId} was not found");
+            if (!baseService.Exists(data.CourseId)) return NotFound($"Course with id {data.CourseId} was not found");
 
             foreach(var studentId in data.StudentsId)
             {
-                if(studentService.Exists(studentId))
+                if(!studentService.Exists(studentId))
                 {
                     response.Add($"Student with Id {studentId} was not found");
                     continue;
@@ -51,10 +51,32 @@ namespace student_risk_hero.Controllers
                 });
             }
 
-            return Ok();
+            return Ok(response);
         }
 
-        [HttpGet("{id}/students")]
+        [HttpDelete("students")]
+        public IActionResult DeleteStudentsToCourse(CourseStudentDto data)
+        {
+            var response = new List<string>();
+
+            if (!baseService.Exists(data.CourseId)) return NotFound($"Course with id {data.CourseId} was not found");
+
+            foreach (var studentId in data.StudentsId)
+            {
+                if (!courseStudentService.Exists(studentId))
+                {
+                    response.Add($"Student with Id {studentId} was not found in course");
+                    continue;
+                }
+
+                var courseStudent = courseStudentService.Get(studentId);
+                courseStudentService.Remove(courseStudent);
+            }
+
+            return Ok(response);
+        }
+
+        [HttpGet("{courseId}/students")]
         public IActionResult GetStudentsToCourse(Guid courseId)
         {
             var course = baseService.Get(courseId);

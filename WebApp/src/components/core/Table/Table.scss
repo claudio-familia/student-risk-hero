@@ -11,7 +11,11 @@ thead tr th {
 }
 .option-th {
     width: 220px;
+    &.third {
+        width: 330px;
+    }
 }
+
 .options {
     display: flex;
     justify-content: space-between;
