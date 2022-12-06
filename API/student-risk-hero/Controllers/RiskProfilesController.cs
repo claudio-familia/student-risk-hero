@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 using student_risk_hero.Contracts;
 using student_risk_hero.Data.Models;
 using student_risk_hero.Data.Models.RiskProfiles;
@@ -22,13 +24,13 @@ namespace student_risk_hero.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(baseService.GetAll());
+            return Ok(baseService.GetAll(x => x.Include(i => i.Student)));
         }
 
         [HttpGet("{id}")]
         public IActionResult Get(Guid id)
         {
-            var entity = baseService.Get(id);
+            var entity = baseService.Get(rp => rp.Include(x => x.Student).ThenInclude(x => x.CurrentCourse).ThenInclude(x => x.Teacher).Include(i => i.Entries).Include(i => i.Evidences), rp => rp.Id == id);
 
             if (entity == null) return NotFound($"The {nameof(RiskProfile)} with id {id} was not found");
 
@@ -41,12 +43,16 @@ namespace student_risk_hero.Controllers
             return Ok(baseService.Add(entity));
         }
 
-        [HttpPost("{id}")]
-        public IActionResult Approve(
-            [FromRoute] Guid id, 
-            [FromBody] RiskProfileApprovalDto entity)
+        [HttpPut]
+        public IActionResult Put(RiskProfile entity)
         {
-            baseService.Approve(id, entity);
+            return Ok(baseService.Update(entity));
+        }
+
+        [HttpPost("{id}/{signer}")]
+        public IActionResult Approve(Guid id, string signer)
+        {
+            baseService.ApproveTemp(id, signer);
 
             return Ok();
         }
@@ -54,7 +60,7 @@ namespace student_risk_hero.Controllers
         [HttpPost("{riskProfileId}/entry")]
         public IActionResult AddEntry(
             [FromRoute] Guid riskProfileId,
-            [FromBody] RiskProfileEntries entity)
+            [FromBody] RiskProfileEntryDto entity)
         {
             baseService.AddEntry(riskProfileId, entity);
 
@@ -72,34 +78,37 @@ namespace student_risk_hero.Controllers
             return Ok();
         }
 
-        [HttpPost("{riskProfileId}/evidence")]
+        [HttpPost("{riskProfileId}/add/evidence")]
+        [Consumes("multipart/form-data")]
+        [AllowAnonymous]
         public IActionResult AddEvidence(
             [FromRoute] Guid riskProfileId,
-            [FromBody] RiskProfileEvidenceDto entity)
+            [FromForm] IFormFile asset,
+            [FromForm] string Data)
         {
-            baseService.AddEvidence(riskProfileId, entity);
-
+            var entity = JsonSerializer.Deserialize<RiskProfileEvidenceDto>(Data);
+            baseService.AddEvidence(riskProfileId, entity, asset);
             return Ok();
         }
 
-        [HttpPost("{riskProfileId}/Closing")]
+        [HttpPatch("{riskProfileId}")]
         public IActionResult AddClosingReason(
             [FromRoute] Guid riskProfileId,
-            [FromBody] RiskProfileClosingDto entity)
+            [FromBody] RiskProfileEntryDto entity)
         {
             baseService.AddClosingReason(riskProfileId, entity);
 
             return Ok();
         }
 
-        [HttpPatch("{riskProfileId}")]
-        public IActionResult Close([FromRoute] Guid riskProfileId)
+        [HttpPatch("{riskProfileId}/closing")]
+        public IActionResult Closing([FromRoute] Guid riskProfileId)
         {
             var entity = baseService.Get(riskProfileId);
 
             if (entity == null) return NotFound("Risk profile not found");
 
-            entity.State = nameof(RiskProfileStatesEnum.Closed);
+            entity.State = nameof(RiskProfileStatesEnum.Closing);
 
             baseService.Update(entity);
 

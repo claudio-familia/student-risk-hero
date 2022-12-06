@@ -18,10 +18,14 @@ namespace student_risk_hero.Data.Models.RiskProfiles
         public DateTime? TeachersApprovalDate { get; set; }
 
         [ForeignKey("StudentId")]
-        public Student Student { get; set; }
+        public Student? Student { get; set; }
+
+        public ICollection<RiskProfileEntries>? Entries { get; set; }
+
+        public ICollection<RiskProfileEvidence>? Evidences { get; set; }
 
         private string state;
-        public string State
+        public string? State
         {
             get => state;
             set

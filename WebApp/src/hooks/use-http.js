@@ -13,14 +13,14 @@ const useHttp = () => {
         setError(null);
 
         try {
+            const header = config.headers ? { ...config.headers } : {'Content-Type': 'application/json', 'Accept': 'application/json'}
             const response = await fetch(
                 `${ENV.apiURL}/${config.url}`,
                 {
                     method: method ? method : "GET",
                     body: data ? JSON.stringify(data) : null,
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
+                        ...header,
                         'Authorization': `Bearer ${authCtx.token}`
                     }
                 }

@@ -6,8 +6,10 @@ import useHttp from "../../../hooks/use-http";
 import Table from "../../../components/core/Table/Table";
 import { ErrorAlert, QuestionAlert, SuccessAlert, InfoAlert } from '../../../services/AlertService';
 import Spinner from "../../../components/core/Layout/Spinner/Spinner";
+import { useHistory } from "react-router-dom";
 
 const CoursePage = () => {
+    const router = useHistory()
     const [openForm, setOpenForm] = useState(false);
     const [courses, setCourses] = useState([]);
     const [currentId, setCurrentId] = useState(undefined);
@@ -27,6 +29,9 @@ const CoursePage = () => {
     const newHandler = () => {
         setOpenForm(true);
         setCurrentId(undefined);
+    }
+    const studentHandler = (id) => {
+        router.push(`/courses/${id}/students`)
     }
 
     const remove = (id) => {
@@ -51,6 +56,7 @@ const CoursePage = () => {
                 >
                     <CourseForm id={currentId} submit={cancelHandler} />
                 </Modal>
+                
 
     const fetchData = async () => {   
         const response = await http.sendRequest({ url: 'courses' });
@@ -90,8 +96,11 @@ const CoursePage = () => {
                         header={header} 
                         rows={rows} 
                         data={courses}
+                        dateColumns={['start', 'end']}
                         editHandler={edit}
                         deleteHandler={remove}
+                        thirdHandler={studentHandler}
+                        thirdName={'View students'}
                     />
                 </div>
             </div>

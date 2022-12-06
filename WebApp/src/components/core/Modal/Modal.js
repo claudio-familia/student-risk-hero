@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import Button from '../Button/Button';
 import './Modal.scss';
 
-const Backdrop = () => <div className="srhero__backdrop" style={{'z-index': '10'}}></div>;
+const Backdrop = () => <div className="srhero__backdrop" style={{zIndex: '10'}}></div>;
 
 const ModalCard = (props) => {
     return (

@@ -13,7 +13,7 @@ namespace student_risk_hero.Controllers
         }
 
         [HttpGet]
-        public IActionResult Get()
+        public virtual IActionResult Get()
         {
             return Ok(baseService.GetAll());
         }
@@ -29,7 +29,7 @@ namespace student_risk_hero.Controllers
         }
 
         [HttpPost]
-        public IActionResult Post(T entity)
+        public virtual IActionResult Post(T entity)
         {
             return Ok(baseService.Add(entity));
         }

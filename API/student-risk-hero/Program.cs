@@ -26,7 +26,9 @@ builder.Services.AddDbContext<StudentRiskHeroContext>(m =>
 builder.Services.AddDataConfiguration();
 builder.Services.AddServices();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddNewtonsoftJson(options =>
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 

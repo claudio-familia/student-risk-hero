@@ -1,4 +1,5 @@
-﻿using student_risk_hero.Contracts;
+﻿using Microsoft.EntityFrameworkCore.Storage;
+using student_risk_hero.Contracts;
 using student_risk_hero.Data.Models;
 using student_risk_hero.Services.EmailServices;
 using student_risk_hero.Utills;
@@ -11,13 +12,25 @@ namespace student_risk_hero.Services
     {
         private readonly IEmailService emailService;
         private readonly IUnitOfWork unitOfWork;
+        private readonly IBaseRepository<Teacher> teacherService;
+        private readonly IBaseRepository<Counselor> counselorService;
+        private readonly IBaseRepository<Director> directorService;
         private readonly IBaseRepository<User> BaseRepository;
 
-        public UserService(IBaseRepository<User> baseRepository, IEmailService emailService, IUnitOfWork unitOfWork) : base(baseRepository)
+        public UserService(
+            IBaseRepository<User> baseRepository, 
+            IEmailService emailService, 
+            IUnitOfWork unitOfWork,
+            IBaseRepository<Teacher> teacherService,
+            IBaseRepository<Counselor> counselorService,
+            IBaseRepository<Director> directorService) : base(baseRepository)
         {
             BaseRepository = baseRepository;
             this.emailService = emailService;
             this.unitOfWork = unitOfWork;
+            this.teacherService = teacherService;
+            this.counselorService = counselorService;
+            this.directorService = directorService;
         }
 
 
@@ -35,7 +48,9 @@ namespace student_risk_hero.Services
 
             entity.Password = Cryptography.Encode(entity.Password);
 
-            var trans = unitOfWork.CreateTransaction();
+            IDbContextTransaction trans = null;
+            if (entity.Role != nameof(RoleTypes.Student))
+                trans = unitOfWork.CreateTransaction();
 
             try
             {
@@ -48,17 +63,43 @@ namespace student_risk_hero.Services
                     teacher.Lastname = entity.Lastname;
                     teacher.Gender = entity.Gender  ;
                     teacher.UserId = createdUser.Id;
+
+                    teacherService.Add(teacher);
+                }
+
+                if (entity.Role == nameof(RoleTypes.Counselor))
+                {
+                    var counselor = new Counselor();
+                    counselor.Firstname = entity.Firstname;
+                    counselor.Lastname = entity.Lastname;
+                    counselor.Gender = entity.Gender;
+                    counselor.UserId = createdUser.Id;
+
+                    counselorService.Add(counselor);
+                }
+
+                if (entity.Role == nameof(RoleTypes.Director))
+                {
+                    var director = new Director();
+                    director.Firstname = entity.Firstname;
+                    director.Lastname = entity.Lastname;
+                    director.Gender = entity.Gender;
+                    director.UserId = createdUser.Id;
+
+                    directorService.Add(director);
                 }
 
                 emailService.SendNewUserMail(createdUser, "Welcome to Student Risk Hero", EmailTypesEnum.Welcoming);
 
-                trans.Commit();
+                if (entity.Role != nameof(RoleTypes.Student))
+                    trans.Commit();
 
                 return createdUser;
             }
             catch (Exception)
             {
-                trans.Rollback();
+                if (entity.Role != nameof(RoleTypes.Student))
+                    trans.Rollback();
 
                 throw;
             }

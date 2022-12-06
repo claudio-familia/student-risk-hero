@@ -11,6 +11,9 @@ import Layout from "../Layout/Layout";
 import { useContext } from 'react';
 import CoursePage from '../../../pages/School/Courses/Course';
 import StudentPage from "../../../pages/Actors/Students/Students";
+import CourseStudentPage from "../../../pages/School/Courses/Students/CourseStudent";
+import RiskProfilePage from "../../../pages/School/RiskProfile/RiskProfile";
+import RiskProfileDetailPage from "../../../pages/School/RiskProfile/RiskProfileDetails/RiskProfileDetails";
 
 const Routes = () => {
     const authCtx = useContext(AuthContext)
@@ -39,7 +42,7 @@ const Routes = () => {
                 <Users />
             </Layout>
         </Route>,
-        <Route path="/courses" key="/courses">
+        <Route path="/courses" key="/courses" exact>
             <Layout>
                 <CoursePage />
             </Layout>
@@ -47,6 +50,21 @@ const Routes = () => {
         <Route path="/students" key="/students">
             <Layout>
                 <StudentPage />
+            </Layout>
+        </Route>,
+        <Route path="/courses/:courseId/students" key="courses/:courseId/students" exact>
+            <Layout>
+                <CourseStudentPage />
+            </Layout>
+        </Route>,
+        <Route path="/risk-profiles" key="/risk-profiles" exact>
+            <Layout>
+                <RiskProfilePage />
+            </Layout>
+        </Route>,
+        <Route path="/risk-profiles/:id" key="/risk-profiles/:id" exact>
+            <Layout>
+                <RiskProfileDetailPage />
             </Layout>
         </Route>
     ];
