@@ -80,7 +80,6 @@ namespace student_risk_hero.Controllers
 
         [HttpPost("{riskProfileId}/add/evidence")]
         [Consumes("multipart/form-data")]
-        [AllowAnonymous]
         public IActionResult AddEvidence(
             [FromRoute] Guid riskProfileId,
             [FromForm] IFormFile asset,

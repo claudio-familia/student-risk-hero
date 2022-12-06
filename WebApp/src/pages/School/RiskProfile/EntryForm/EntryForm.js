@@ -26,7 +26,6 @@ const EntryForm = (props) => {
 
     const {
         value: isClosingFinding,
-        hasError: isClosingFindingError,
         setIsTouched: setIsClosingFindingsTouched,
         setValue: setIsClosingFindingsValue,
     } = useInput();

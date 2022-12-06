@@ -1,0 +1,30 @@
+@import '../../../../assets/styles/text.scss';
+@import '../../../../assets/styles/colors.scss';
+
+h1 {
+    @include font-style(h1);
+    span {
+        color: $secondary;
+    }
+}
+.description {
+    @include font-style(body);
+}
+.title {
+    @include font-style(h3);
+}
+.evidence {
+    text-align: center;
+    img {
+        width: 150px;
+    }
+    a, a:hover, a:focus, a:active {
+        text-decoration: none;
+        color: inherit;
+    }
+    h4 {
+        text-decoration: none;
+        color: $primary;
+        
+    }
+}

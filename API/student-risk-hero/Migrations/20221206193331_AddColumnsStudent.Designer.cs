@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using student_risk_hero.Data;
 
@@ -11,9 +12,11 @@ using student_risk_hero.Data;
 namespace studentriskhero.Migrations
 {
     [DbContext(typeof(StudentRiskHeroContext))]
-    partial class StudentRiskHeroContextModelSnapshot : ModelSnapshot
+    [Migration("20221206193331_AddColumnsStudent")]
+    partial class AddColumnsStudent
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -743,7 +746,7 @@ namespace studentriskhero.Migrations
             modelBuilder.Entity("student_risk_hero.Data.Models.AssignmentStudent", b =>
                 {
                     b.HasOne("student_risk_hero.Data.Models.Assignment", "Assignment")
-                        .WithMany("Submissions")
+                        .WithMany()
                         .HasForeignKey("AssignmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -813,11 +816,6 @@ namespace studentriskhero.Migrations
                         .IsRequired();
 
                     b.Navigation("CurrentCourse");
-                });
-
-            modelBuilder.Entity("student_risk_hero.Data.Models.Assignment", b =>
-                {
-                    b.Navigation("Submissions");
                 });
 
             modelBuilder.Entity("student_risk_hero.Data.Models.RiskProfiles.RiskProfile", b =>

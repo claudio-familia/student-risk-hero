@@ -14,6 +14,8 @@ import StudentPage from "../../../pages/Actors/Students/Students";
 import CourseStudentPage from "../../../pages/School/Courses/Students/CourseStudent";
 import RiskProfilePage from "../../../pages/School/RiskProfile/RiskProfile";
 import RiskProfileDetailPage from "../../../pages/School/RiskProfile/RiskProfileDetails/RiskProfileDetails";
+import AssignmentsPage from "../../../pages/School/Assignments/Assignments";
+import AssignmentsStudentPage from "../../../pages/School/Assignments/AssignmentsForm/AssignmentsStudent";
 
 const Routes = () => {
     const authCtx = useContext(AuthContext)
@@ -65,6 +67,16 @@ const Routes = () => {
         <Route path="/risk-profiles/:id" key="/risk-profiles/:id" exact>
             <Layout>
                 <RiskProfileDetailPage />
+            </Layout>
+        </Route>,
+         <Route path="/assignments" key="/assignments" exact>
+            <Layout>
+                <AssignmentsPage />
+            </Layout>
+        </Route>,
+         <Route path="/assignments/:id" key="/assignments/:id" exact>
+            <Layout>
+                <AssignmentsStudentPage />
             </Layout>
         </Route>
     ];

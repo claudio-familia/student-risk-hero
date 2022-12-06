@@ -19,7 +19,7 @@ namespace student_risk_hero.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult Get(Guid id)
+        public virtual IActionResult Get(Guid id)
         {
             var entity = baseService.Get(id);
 

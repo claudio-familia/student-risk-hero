@@ -12,13 +12,18 @@ namespace student_risk_hero.Services
     public class AuthService : IAuthService
     {
         private readonly IBaseRepository<User> baseRepository;
+        private readonly IBaseRepository<Student> studentRepository;
 
         public IConfiguration Configuration { get; }
 
-        public AuthService(IBaseRepository<User> baseRepository, IConfiguration configuration)
+        public AuthService(
+            IBaseRepository<User> baseRepository, 
+            IConfiguration configuration,
+            IBaseRepository<Student> studentRepository)
         {
             this.baseRepository = baseRepository;
             Configuration = configuration;
+            this.studentRepository = studentRepository;
         }
 
         public string Login(CredentialDto credentials)
@@ -45,6 +50,13 @@ namespace student_risk_hero.Services
                  new Claim(ClaimTypes.Name, user.Username),
                  new Claim(ClaimTypes.Role, user.Role)
             };
+
+            if (user.Role == nameof(RoleTypes.Student)) {
+                var student = studentRepository.Get(st => st.UserId == user.Id);
+                if (student != null)
+                    claims.Add(new Claim(ClaimTypes.Sid, student.Id.ToString()));
+                    claims.Add(new Claim(ClaimTypes.GroupSid, student.Course.ToString()));
+            }
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Authentication:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);

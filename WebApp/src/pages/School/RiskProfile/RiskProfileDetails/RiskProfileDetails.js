@@ -4,7 +4,6 @@ import Modal from "../../../../components/core/Modal/Modal";
 import Card from "../../../../components/core/Card/Card";
 import useHttp from "../../../../hooks/use-http";
 import Spinner from "../../../../components/core/Layout/Spinner/Spinner";
-import RiskProfileForm from '../RiskProfileForm/RiskProfileForm';
 import checked from '../../../../assets/images/checked.png';
 import unchecked from '../../../../assets/images/unchecked.png';
 import IMAGE from '../../../../assets/images/jpg.png';
@@ -304,7 +303,7 @@ const RiskProfileDetailPage = () => {
                             {!riskProfile.entries && <h3 style={{textAlign: 'center'}}>Risk profile does not have any evidence yet</h3>}
                             <div className="main-timeline7">
                                 {riskProfile.entries.map((item, idx) => (
-                                    <div className="timeline" key={idx}>
+                                    <div className="timeline" key={idx} onClick={() => { setCurrentEntryId(item.id) }}>
                                         <div className="timeline-icon">
                                             <i className="fa fa-book"></i>
                                         </div>
