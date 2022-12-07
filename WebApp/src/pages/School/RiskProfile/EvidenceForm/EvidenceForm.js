@@ -3,12 +3,15 @@ import Input from "../../../../components/core/Input/Input";
 import Button from "../../../../components/core/Button/Button";
 import useHttp from "../../../../hooks/use-http";
 import { SuccessAlert } from "../../../../services/AlertService";
-import React, { useRef } from "react";
+import React, { useContext, useRef } from "react";
 import Spinner from "../../../../components/core/Layout/Spinner/Spinner";
 import ENV from "../../../../utils/env";
+import AuthContext from "../../../../store/auth-context";
 
 const EvidenceForm = (props) => {
     const inputFile = useRef();
+    const ctx = useContext(AuthContext);
+    const token= ctx.token;
 
     const {
         value: description,
@@ -44,6 +47,9 @@ const EvidenceForm = (props) => {
 
             fetch(ENV.apiURL+'/risk-profile/'+props.riskProfileId+'/add/evidence', {
                 body: data,
+                headers: {
+                  'Authorization': 'Bearer '+token   
+                },
                 method: 'POST'
             }).then(data => {
                 SuccessAlert('Operation completed', 'Evidence have been created successfully');

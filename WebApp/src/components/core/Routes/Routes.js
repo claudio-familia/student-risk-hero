@@ -16,9 +16,12 @@ import RiskProfilePage from "../../../pages/School/RiskProfile/RiskProfile";
 import RiskProfileDetailPage from "../../../pages/School/RiskProfile/RiskProfileDetails/RiskProfileDetails";
 import AssignmentsPage from "../../../pages/School/Assignments/Assignments";
 import AssignmentsStudentPage from "../../../pages/School/Assignments/AssignmentsForm/AssignmentsStudent";
+import AuthUtil from "../../../utils/auth";
 
 const Routes = () => {
     const authCtx = useContext(AuthContext)
+    const session = AuthUtil.getTokenData(authCtx.token);
+    const role = session ? session["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] : undefined
 
     const unathorizedUrls = [
         <Route path="/login" key="/login">
@@ -37,6 +40,49 @@ const Routes = () => {
             <ForgotPassword />
         </Route>
     ];
+
+    const studentsURL = [
+        <Route path="/assignments" key="/assignments" exact>
+        <Layout>
+            <AssignmentsPage />
+        </Layout>
+        </Route>,
+        <Route path="/assignments/:id" key="/assignments/:id" exact>
+            <Layout>
+                <AssignmentsStudentPage />
+            </Layout>
+        </Route>
+    ]
+
+    const teacherUrls = [
+        <Route path="/students" key="/students">
+            <Layout>
+                <StudentPage />
+            </Layout>
+        </Route>,
+        <Route path="/risk-profiles" key="/risk-profiles" exact>
+            <Layout>
+                <RiskProfilePage />
+            </Layout>
+        </Route>,
+        <Route path="/risk-profiles/:id" key="/risk-profiles/:id" exact>
+            <Layout>
+                <RiskProfileDetailPage />
+            </Layout>
+        </Route>,
+        <Route path="/assignments" key="/assignments" exact>
+            <Layout>
+                <AssignmentsPage />
+            </Layout>
+        </Route>,
+        <Route path="/assignments/:id" key="/assignments/:id" exact>
+            <Layout>
+                <AssignmentsStudentPage />
+            </Layout>
+        </Route>
+    ]
+
+
 
     const authorizedUrls = [
         <Route path="/users" key="/users">
@@ -92,7 +138,9 @@ const Routes = () => {
                         </Layout>
                     </Route>
                     {unathorizedUrls}
-                    {authCtx.isLoggedIn && authorizedUrls}
+                    {authCtx.isLoggedIn && role === "Student" && studentsURL}
+                    {authCtx.isLoggedIn && role === "Teacher" && teacherUrls}
+                    {authCtx.isLoggedIn && role !== "Student" && role !== "Teacher" && authorizedUrls}
                     <Route path="*">
                         <Layout>
                             <Redirect to={'/'} />
