@@ -41,6 +41,9 @@ const Login = () => {
             };
         });
     }
+    const goToLanding = () => {
+        history.push('/landing')
+    }
 
     const onLogin = (e) => {
         e.preventDefault();
@@ -63,6 +66,7 @@ const Login = () => {
                   break;
             }
         }).catch(data => {
+            setLoading(false);
             console.log(data)
         });
     }
@@ -129,6 +133,8 @@ const Login = () => {
                                             onChange={onInputPasswordChange} />                                
                                         {state.error && <span className='label-error'>{state.error}</span>}
                                         <Button type="submit">Login</Button>
+                                        <br />
+                                        <Button onClick={goToLanding}>Go to Landing page</Button>
                                         <Link to='/sign-up'>Registrarme</Link>
                                         <Link to='/forgot-password'>Olvide mi contraseña</Link>
                                     </div>

@@ -8,6 +8,7 @@ import readers from '../../../assets/images/readers.jpg';
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import Spinner from '../../../components/core/Layout/Spinner/Spinner';
+import { SuccessAlert } from '../../../services/AlertService';
 
 const SignUp = () => {
     const history = useHistory();
@@ -97,8 +98,11 @@ const SignUp = () => {
                 addValidation(error.toString(), key);
             }
            } else {
-            alert('created')
+            SuccessAlert()
            }
+        })
+        .catch(e => {
+            setLoading(false);
         });
     }
 

@@ -1,5 +1,8 @@
 @import '../../../../assets/styles/colors.scss';
 @import '../../../../assets/styles/text.scss';
+.line {
+    border-bottom: 2px solid $tertiary;
+}
 
 .srhero__sidebar {
     display: block;
