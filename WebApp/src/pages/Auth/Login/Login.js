@@ -50,6 +50,8 @@ const Login = () => {
         setLoading(true);
         AuthService.login(state.Username, state.Password)
         .then(data => {
+            setLoading(false);
+
             switch(data.status) {
                 case 200:
                     data.json().then((token) => {
