@@ -17,6 +17,7 @@ import RiskProfileDetailPage from "../../../pages/School/RiskProfile/RiskProfile
 import AssignmentsPage from "../../../pages/School/Assignments/Assignments";
 import AssignmentsStudentPage from "../../../pages/School/Assignments/AssignmentsForm/AssignmentsStudent";
 import AuthUtil from "../../../utils/auth";
+import Landing from "../../../pages/Landing/Landing";
 
 const Routes = () => {
     const authCtx = useContext(AuthContext)
@@ -38,6 +39,9 @@ const Routes = () => {
         </Route>,
         <Route path="/forgot-password/:token" key="/forgot-password/:token">
             <ForgotPassword />
+        </Route>,
+        <Route path="/landing" key="/landing">
+            <Landing />
         </Route>
     ];
 

@@ -1,0 +1,68 @@
+@import '../../assets/styles/colors.scss';
+@import '../../assets/styles/text.scss';
+
+.srhero__divisas {
+    display: block;
+    width: 100%;
+    padding: 20px;
+    h1 {
+        @include font-style(h1);
+        margin-bottom: 0.5rem;
+    }
+    h2 {
+        @include font-style(h2);
+    }
+    .line {
+        margin-bottom: 3rem;
+    }
+    span {
+        font-weight: bold;
+        font-size: 1.1rem;
+        margin-right: 1rem;
+    }
+    .information {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 1050px;
+
+        &:hover {
+            h3 {
+                background-color: $main-secondary;
+            }
+            cursor: pointer;
+        }
+        h2 {
+            padding: 10px;
+            color: $main-primary;
+        }
+        li {
+            @include font-style(h3);
+            margin-bottom: 1rem;
+            text-align: center
+        }
+        ul {
+            margin-bottom: 2rem;
+        }
+        h3 {
+            @include font-style(h2);
+            border: 1px solid $main-primary;
+            border-radius: 5px;
+            padding: 10px;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        button {
+            margin-top: 2rem;
+        }
+    }
+    .content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        @include font-style(h3);
+        text-align: justify;
+    }
+}
+
+
